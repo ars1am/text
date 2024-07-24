@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Notepad</title>
+    <style>
+        :root {
+            --background-color: #f0f0f0;
+            --text-color: #000000;
+            --textarea-background: #ffffff;
+            --button-background: #f2f2f2;
+            --button-hover: #e3e3e3;
+            --button-text: #000000;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #121212;
+            --text-color: #ffffff;
+            --textarea-background: #1e1e1e;
+            --button-background: #444444;
+            --button-hover: #666666;
+            --button-text: #ffffff;
+        }
+
+        body {
+            font-family: Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .notepad {
+            width: 70%;
+            height: 90%;
+            background: var(--textarea-background);
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+            padding: 5px;
+            font-size: 16px;
+            border: none;
+            outline: none;
+            resize: none;
+            background: var(--textarea-background);
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+
+        .buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            background: var(--button-background);
+            color: var(--button-text);
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: var(--button-hover);
+        }
+    </style>
+</head>
+<body>
+    <div class="notepad">
+        <textarea id="notepad" placeholder="Start typing..."></textarea>
+        <div class="buttons">
+            <button onclick="saveNote()">Save Note</button>
+            <button onclick="shareNote()">Share Note</button>
+            <button onclick="toggleDarkMode()">Toggle Dark Mode</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const params = new URLSearchParams(window.location.search);
+            const sharedNote = params.get('note');
+            if (sharedNote) {
+                document.getElementById('notepad').value = decodeURIComponent(sharedNote);
+            } else {
+                const savedNote = localStorage.getItem('notepadContent');
+                if (savedNote) {
+                    document.getElementById('notepad').value = savedNote;
+                }
+            }
+
+            const darkMode = localStorage.getItem('darkMode');
+            if (darkMode === 'enabled') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        });
+
+        function saveNote() {
+            const notepadContent = document.getElementById('notepad').value;
+            localStorage.setItem('notepadContent', notepadContent);
+            alert('Note saved!');
+        }
+
+        function shareNote() {
+            const notepadContent = document.getElementById('notepad').value;
+            const encodedNote = encodeURIComponent(notepadContent);
+            const shareableURL = `${window.location.origin}${window.location.pathname}?note=${encodedNote}`;
+            prompt('Copy this URL to share your note:', shareableURL);
+        }
+
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            if (currentTheme === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('darkMode', 'disabled');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('darkMode', 'enabled');
+            }
+        }
+    </script>
+</body>
+</html>
